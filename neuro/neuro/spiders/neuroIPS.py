@@ -16,12 +16,11 @@ class NeuroSpider(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-
         years = []
         for href in response.xpath('//div[@class="col-sm"]//a'):
-            year_text = href.xpath('text()').get() 
+            year_text = href.xpath('text()').get()
             match = re.search(r'\b\d{4}\b', year_text)  #trouver année
-        
+            print("match is",match)
             if match:
                 year = match.group()
                 link = href.xpath('@href').get() #recupérer le lien avec articles de l'année
