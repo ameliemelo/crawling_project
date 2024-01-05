@@ -2,7 +2,7 @@ import re
 import json
 import scrapy
 import requests
-
+from urllib.parse import quote
 
 class NeuroSpider(scrapy.Spider):
     name = 'NeuroIPS'
@@ -21,11 +21,11 @@ class NeuroSpider(scrapy.Spider):
         for href in response.xpath('//div[@class="col-sm"]//a'):
             year_text = href.xpath('text()').get() 
             match = re.search(r'\b\d{4}\b', year_text)  #trouver année
-        
             if match:
                 year = match.group()
-                link = href.xpath('@href').get() #recupérer le lien avec articles de l'année
-                years.append({"year": year, "link": link})
+                if year=='2004':
+                    link = href.xpath('@href').get() #recupérer le lien avec articles de l'année
+                    years.append({"year": year, "link": link})
 
         #pour aller voir les pages de chaque année
         for year_info in years:
@@ -44,44 +44,50 @@ class NeuroSpider(scrapy.Spider):
 
     def parse_article(self, response):
         year = response.meta["year"]
-        
-        # Extraire les auteurs, titre, abstract
-        # Ca fait pas années par années et j'arrive pas a trouver de solution 
+    
         authors = response.xpath('//h4[contains(text(), "Authors")]/following-sibling::p[1]/i/text()').getall()
         title = response.xpath('//div[@class="container-fluid"]/div[@class="col"]/h4/text()').get()
-        abstract_text =  ' '.join(response.xpath('//h4[contains(text(), "Abstract")]/following-sibling::*/text()').getall())
+        #abstract_text =  ' '.join(response.xpath('//h4[contains(text(), "Abstract")]/following-sibling::*/text()').getall())
 
-        pdf_link = response.xpath('//div/a[contains(text(), "Paper")]/@href').get()
+        #recup sujet
+        search_query = 'Accelerated Mini-Batch Stochastic Dual Coordinate Ascent'
+        formatted_query = quote(search_query)
+
+        # Maintenant, formatted_query est prêt à être utilisé dans votre URL
+        search_url_arxiv = f'https://arxiv.org/search/?query={search_query}&searchtype=title&source=header'
+
+        
+        yield response.follow(search_url_arxiv, callback=self.parse_arxiv, meta={"year": year, "title" :title})
+
+        #pdf_link = response.xpath('//div/a[contains(text(), "Paper")]/@href').get()
 
         #marche pas faudra utiliser grobid surement
         #if pdf_link: info_pdf = self.extract_info(pdf_link)
             
 
-        yield {
-            "year": year,
-            "authors": authors,
-            "title" : title,
-            "abstract": abstract_text,
+        #yield {
+            #"year": year,
+            #"authors": authors,
+            #"title" : title,
+            #"abstract": abstract_text,
             #"info_pdf": info_pdf,
 
-        }
+        #}
 
 
 
 
-
-    def extract_info(self, pdf_link):
-        full_pdf_url = f'https://papers.nips.cc{pdf_link}'
-        grobid_url = 'http://localhost:8070/api/processFulltextDocument'
-
-        # Requête à Grobid avec le contenu du PDF
-        files = {'input': (full_pdf_url, requests.get(full_pdf_url).content)}
-        params = {'consolidateHeader': 'true', 'consolidateCitations': 'true'}
-
-        response = requests.post(grobid_url, files=files, params=params)
+    def parse_arxiv(self,response):
+        arxiv_link = response.xpath('//p[@class="list-title is-inline-block"]/a/@href').getall()
+        yield response.follow(arxiv_link, callback=self.parse_subject)
         
-        # Analyser la réponse de Grobid (XML ou JSON)
-        # Vous pouvez ajouter ici la logique pour extraire les informations spécifiques dont vous avez besoin
-        grobid_response = response.text
+        
+        
 
-        return grobid_response
+    def parse_subject(self,response):
+        subjects = response.css('td.tablecell.subjects span.primary-subject::text').getall()
+
+        yield {"subjects": subjects}
+
+
+
