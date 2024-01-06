@@ -1,0 +1,56 @@
+[
+  {
+    "first_name": "Marcelo",
+    "middle_name": null,
+    "surname": "Fiori",
+    "email": "mfiori@fing.edu.uy"
+  },
+  {
+    "first_name": "Pablo",
+    "middle_name": null,
+    "surname": "Mus\u00e9",
+    "email": null
+  },
+  {
+    "first_name": "Guillermo",
+    "middle_name": null,
+    "surname": "Sapiro",
+    "email": "guillermo.sapiro@duke.edu"
+  },
+  {
+    "first_name": "Nan",
+    "middle_name": null,
+    "surname": "Li",
+    "email": "nan.li@temple.edu"
+  },
+  {
+    "first_name": "Longin",
+    "middle_name": "Jan",
+    "surname": "Latecki",
+    "email": "latecki@temple.edu"
+  },
+  {
+    "first_name": "Amr",
+    "middle_name": null,
+    "surname": "Ahmed",
+    "email": "amra@google.com"
+  },
+  {
+    "first_name": "Sujith",
+    "middle_name": null,
+    "surname": "Ravi",
+    "email": "sravi@google.com"
+  },
+  {
+    "first_name": "Shravan",
+    "middle_name": "M",
+    "surname": "Narayanamurthy",
+    "email": "shravanmn@gmail.com"
+  },
+  {
+    "first_name": "Alexander",
+    "middle_name": "J",
+    "surname": "Smola",
+    "email": null
+  }
+]
