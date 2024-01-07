@@ -27,5 +27,5 @@ CREATE TABLE citations (
     article_id INTEGER,
     title TEXT,
     authors TEXT,
-    FOREIGN KEY (article_id) REFERENCES articles(id),
+    FOREIGN KEY (article_id) REFERENCES articles(id)
 );
